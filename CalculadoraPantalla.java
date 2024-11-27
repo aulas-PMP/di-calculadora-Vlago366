@@ -13,7 +13,6 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -46,8 +45,8 @@ public class CalculadoraPantalla extends JFrame{
 
         JScrollPane scrollTexto = new JScrollPane(areaTexto); // ayuda a corregir el cambio de lineas al escribir en la
 
-        if(tecladoOn){
-            activarTeclado();
+        if(tecladoOn){ // Si el teclado está activado
+            activarTeclado();   // Permite la escritura de teclado
         }
         
         pantallaSecundaria.add(scrollTexto, BorderLayout.CENTER); // panel secundario donde se escribe los números
@@ -106,6 +105,7 @@ public class CalculadoraPantalla extends JFrame{
             texto = calcularOperacion(texto, "+-"); // Luego hace las sumas y restas y actualiza el valor de texto
     
             areaTexto.setText(texto); // Escribe el texto en la pantalla
+            
         } catch (Exception e) {
             areaTexto.setText("Error"); // Si peta en el proceso
         }
