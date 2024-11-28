@@ -1,23 +1,8 @@
-import java.awt.BorderLayout;
-import java.awt.Button;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingUtilities;
+import java.awt.*;
+import java.awt.event.*;
+import java.text.*;
+import java.util.regex.*;
+import javax.swing.*;
 
 public class CalculadoraPantalla extends JFrame{
 
@@ -32,16 +17,14 @@ public class CalculadoraPantalla extends JFrame{
         JPanel pantallaSecundaria = new JPanel(); // crea la pantalla donde se escribe texto
         pantallaSecundaria.setBackground(Color.LIGHT_GRAY); // color de pantalla
         pantallaSecundaria.setLayout(new BorderLayout()); // El borde de layout
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
-        pantallaSecundaria.setPreferredSize(new Dimension(380, 500)); // Tamaño fijo
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize(); // Recoge las dimensiones de la pantalla
         pantallaSecundaria.setBounds(10, 10, d.width / 2, 100); // posición y tamaño fijo de la pantalla
 
         areaTexto = new JTextArea(); // permite ingresar texto
-        areaTexto.setLineWrap(true); // controla la longitud del texto cambiando a una segunda línea en caso de ser
-                                     // necesario
+        areaTexto.setLineWrap(true); // controla la longitud del texto cambiando a una segunda línea en caso de ser necesario
         areaTexto.setWrapStyleWord(true); // controla que el texto no sea cortado a la mitad
-        areaTexto.setFont(new Font("Arial", Font.PLAIN, 14)); // La fuente en el espacio de texto
-        areaTexto.setEditable(false); // Evita que el usuario escriba directamente en el área de texto
+        areaTexto.setFont(new Font("Arial", Font.PLAIN, 14)); // La fuente en el area de texto
+        areaTexto.setEditable(false); // Evita que el usuario escriba directamente en el área de texto, sin esto acepta todo tipo de escritura
 
         JScrollPane scrollTexto = new JScrollPane(areaTexto); // ayuda a corregir el cambio de lineas al escribir en la
 
@@ -105,61 +88,57 @@ public class CalculadoraPantalla extends JFrame{
             texto = calcularOperacion(texto, "+-"); // Luego hace las sumas y restas y actualiza el valor de texto
     
             areaTexto.setText(texto); // Escribe el texto en la pantalla
-            
         } catch (Exception e) {
             areaTexto.setText("Error"); // Si peta en el proceso
         }
     }
-    
+
     private String calcularOperacion(String texto, String operadores) {
         // Expresión regular para encontrar números y operadores
         String regex = "(-?\\d+(?:[.,]\\d+)?)([" + operadores + "])(-?\\d+(?:[.,]\\d+)?)";
     
         // Crear el patrón
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(texto);
+        Pattern pattern = Pattern.compile(regex);   // crea un patron que busca los operadores dados como parámetros
+        Matcher matcher = pattern.matcher(texto);   // busca un determinado patrón en el area de texto
     
         // Configurar el formateador para la salida final
-        DecimalFormat df = new DecimalFormat("#.##");
-        DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();
+        DecimalFormat df = new DecimalFormat("#.##");   //formatea el caracter .
+        DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();  //
         symbols.setDecimalSeparator(',');
         df.setDecimalFormatSymbols(symbols);
     
         while (matcher.find()) {
             // Convertir los números a formato estándar para cálculo
-            double num1 = Double.parseDouble(matcher.group(1).replace(',', '.'));
-            String operador = matcher.group(2);
-            double num2 = Double.parseDouble(matcher.group(3).replace(',', '.'));
-            double resultado = 0;
+            double num1 = Double.parseDouble(matcher.group(1).replace(',', '.')); // obtiene el grupo de numeros antes del operador
+            String operador = matcher.group(2); //obtiene el operador
+            double num2 = Double.parseDouble(matcher.group(3).replace(',', '.')); // obtiene el grupo de numeros que sigue al operador
+            double resultado = 0;   // inaugura la variable resultado en 0
     
             // Realizar la operación
             switch (operador) {
                 case "*":
-                    resultado = num1 * num2;
+                    resultado = num1 * num2;    //Hoy no dormirás sabiendo esto, el num1 se multiplica al num2, inesperado, ¿a que sí?
                     break;
                 case "/":
                     if (num2 == 0) {
-                        throw new ArithmeticException("División por cero");
+                        throw new ArithmeticException("División por cero"); // causa de error: Division indeterminada
                     }
-                    resultado = num1 / num2;
+                    resultado = num1 / num2;    // para sorpresa de nadie hace una división
                     break;
                 case "+":
-                    resultado = num1 + num2;
+                    resultado = num1 + num2;    // quizás te impacte saber esto, pero el num1 se suma al num2, impresionante, ¿verdad?
                     break;
                 case "-":
-                    resultado = num1 - num2;
+                    resultado = num1 - num2;    // el impacto de tan gran línea de código te lena de determinación. Resta dos números. ¡Alucinante!
                     break;
             }
     
-            // Reemplazar la operación con el resultado sin formatear
-            texto = texto.substring(0, matcher.start()) + resultado + texto.substring(matcher.end());
+            texto = texto.substring(0, matcher.start()) + resultado + texto.substring(matcher.end()); // reescribe al area de texto con el resultado
     
-            // Volver a buscar el patrón en el texto actualizado
-            matcher = pattern.matcher(texto);
+            matcher = pattern.matcher(texto); // vuelva a buscar el siguiente patron en el area de texto
         }
     
-        // Formatear el resultado final antes de devolverlo
-        return texto.replace('.', ','); // Cambiar el punto por coma para la visualización final
+        return texto.replace('.', ','); // Reemplaza el punto por coma para la visualización final
     }
     
 
@@ -167,14 +146,14 @@ public class CalculadoraPantalla extends JFrame{
         areaTexto.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                int keyCode = e.getKeyCode();
+                int keyCode = e.getKeyCode(); // obtiene el codigo de la tecla
     
                 if (isValidKey(keyCode)) {
                     String keyText = "";
     
                     // Convertir las teclas numéricas y operadores a texto
                     if (keyCode >= KeyEvent.VK_NUMPAD0 && keyCode <= KeyEvent.VK_NUMPAD9) {
-                        keyText = String.valueOf(keyCode - KeyEvent.VK_NUMPAD0); // Números del teclado numérico
+                        keyText = String.valueOf(keyCode - KeyEvent.VK_NUMPAD0); // Números del teclado numérico (numpad)
                     } else if (keyCode == KeyEvent.VK_ADD) {
                         keyText = "+";
                     } else if (keyCode == KeyEvent.VK_SUBTRACT) {
@@ -183,7 +162,9 @@ public class CalculadoraPantalla extends JFrame{
                         keyText = "*";
                     } else if (keyCode == KeyEvent.VK_DIVIDE) {
                         keyText = "/";
-                    } else if (keyCode == KeyEvent.VK_ENTER) {
+                    } else if (keyCode == KeyEvent.VK_DECIMAL) {
+                        keyText = ",";
+                    }else if (keyCode == KeyEvent.VK_ENTER) {
                         manejarLaOperacion(); // Procesar la operación al presionar Intro
                         return; // Salir del método sin añadir más texto
                     }
@@ -200,15 +181,14 @@ public class CalculadoraPantalla extends JFrame{
                         || keyCode == KeyEvent.VK_SUBTRACT // Resta
                         || keyCode == KeyEvent.VK_MULTIPLY // Multiplicación
                         || keyCode == KeyEvent.VK_DIVIDE // División
-                        || keyCode == KeyEvent.VK_ENTER; // Intro para igual
+                        || keyCode == KeyEvent.VK_ENTER // Intro para igual
+                        || keyCode == KeyEvent.VK_DECIMAL; // punto para la coma
             }
         });
     }
     
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            CalculadoraPantalla ventana = new CalculadoraPantalla();
-            ventana.setVisible(true);
-        });
+            CalculadoraPantalla ventana = new CalculadoraPantalla();    // Crea el objeto calculadora
+            ventana.setVisible(true);   // declara visible la ventana
     }
 }
