@@ -1,8 +1,23 @@
-import java.awt.*;
-import java.awt.event.*;
-import java.text.*;
-import java.util.regex.*;
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Button;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 public class CalculadoraPantalla extends JFrame {
 
@@ -69,7 +84,7 @@ public class CalculadoraPantalla extends JFrame {
 
         // Panel para las operaciones
         JPanel panelOperaciones = new JPanel(); // Crea el panel para las operaciones
-        panelOperaciones.setLayout(new GridLayout(5, 1)); // Panel para las operaciones
+        panelOperaciones.setLayout(new GridLayout(6, 1)); // Panel para las operaciones
         panelOperaciones.setBounds((d.width / 2) - 100, 180, 100, 350); // Ubica al lado derecho
         add(panelOperaciones); // Añade el panel de operaciones al JFrame
 
@@ -77,7 +92,7 @@ public class CalculadoraPantalla extends JFrame {
                 "1", "2", "3", 
                 "4", "5", "6", 
                 "7", "8", "9", 
-                "0","C", "=" 
+                "0","C", "Change Mode" 
         }; // Son los nombres de los botones numéricos
 
         for (String texto : botonesNumericos) { // Para el array con los botones mientras haya
@@ -99,7 +114,7 @@ public class CalculadoraPantalla extends JFrame {
 
         String[] botonesOperaciones = {
                 "/", "*", "-",
-                "+", ","
+                "+", ",", "="
         }; // Son los nombres de los botones de operaciones
 
         for (String texto : botonesOperaciones) { // Para el array con los botones de operaciones mientras haya
