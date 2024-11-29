@@ -19,7 +19,6 @@ public class CalculadoraPantalla extends JFrame {
         pantallaSecundaria.setBackground(Color.LIGHT_GRAY); // color de pantalla
         pantallaSecundaria.setLayout(new BorderLayout()); // El borde de layout
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize(); // Recoge las dimensiones de la pantalla
-        pantallaSecundaria.setBounds(10, 10, d.width / 2, 100); // posición y tamaño fijo de la pantalla
 
         areaTexto = new JTextArea(); // permite ingresar texto
         areaTexto.setLineWrap(true); // controla la longitud del texto cambiando a una segunda línea en caso de ser necesario
@@ -55,12 +54,11 @@ public class CalculadoraPantalla extends JFrame {
         panelAlmacenado.setBounds(10, 120, d.width / 2, 50); // Panel debajo del panel de entrada
         panelAlmacenado.add(scrollAlmacenado, BorderLayout.CENTER);
         
-        add(panelEntrada); // Añadir panel de entrada al JFrame
         add(panelAlmacenado); // Añadir panel de dato almacenado al JFrame
+        add(panelEntrada); // Añadir panel de entrada al JFrame
 
-        setResizable(false);
+        setResizable(true); // permiso para ampliar la pantalla
         setSize((d.width / 2), 600); // Indica el ancho y alto del recuadro
-        setLocationRelativeTo(null); // Mantiene la ventana siempre centrada
         setLayout(null); // Layout nulo, para tener control manual de los tamaños
 
         // Panel para los botones numéricos
@@ -74,7 +72,7 @@ public class CalculadoraPantalla extends JFrame {
         JPanel panelOperaciones = new JPanel(); // Crea el panel para las operaciones
         panelOperaciones.setLayout(new GridLayout(5, 1)); // Panel para las operaciones
         panelOperaciones.setBackground(Color.LIGHT_GRAY); // color del panel
-        panelOperaciones.setBounds((d.width / 2) - 100, 120, 100, 350); // Ubica al lado derecho
+        panelOperaciones.setBounds((d.width / 2) - 100, 180, 100, 350); // Ubica al lado derecho
         add(panelOperaciones); // Añade el panel de operaciones al JFrame
 
         String[] botonesNumericos = { 
@@ -151,18 +149,15 @@ public class CalculadoraPantalla extends JFrame {
     }
 
     private String calcularOperacion(String texto, String operadores) {
-        // Expresión regular para encontrar números y operadores
-        String regex = "(-?\\d+(?:[.,]\\d+)?)([" + operadores + "])(-?\\d+(?:[.,]\\d+)?)";
+        String regex = "(-?\\d+(?:[.,]\\d+)?)([" + operadores + "])(-?\\d+(?:[.,]\\d+)?)"; // busca el operador, detecta el numero de repeticiones
     
-        // Crear el patrón
         Pattern pattern = Pattern.compile(regex);   // crea un patrón que busca los operadores dados como parámetros
         Matcher matcher = pattern.matcher(texto);   // busca un determinado patrón en el área de texto
     
-        // Configurar el formateador para la salida final
-        DecimalFormat df = new DecimalFormat("#.##");   // formatea el número
-        DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();  
-        symbols.setDecimalSeparator(',');
-        df.setDecimalFormatSymbols(symbols);
+        DecimalFormat df = new DecimalFormat("#.##");   // formatea el número que contiene .
+        DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance();      // crea un simbolo para formatear
+        symbols.setDecimalSeparator(',');   // setea la sepacion decimal con ,
+        df.setDecimalFormatSymbols(symbols);    // cambia el . por ,
     
         while (matcher.find()) {
             // Convertir los números a formato estándar para cálculo
@@ -180,7 +175,7 @@ public class CalculadoraPantalla extends JFrame {
                     if (num2 == 0) {
                         throw new ArithmeticException("División por cero"); // causa de error: Division indeterminada
                     }
-                    resultado = num1 / num2;     // para sorpresa de nadie hace una división
+                    resultado = num1 / num2;     // para sorpresa de nadie, hace una división
                     break;
                 case "+":
                     resultado = num1 + num2;    // quizás te impacte saber esto, pero el num1 se suma al num2, impresionante, ¿verdad?
