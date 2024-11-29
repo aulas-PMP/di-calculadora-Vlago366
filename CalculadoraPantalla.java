@@ -64,14 +64,12 @@ public class CalculadoraPantalla extends JFrame {
         // Panel para los botones numéricos
         JPanel panelNumeros = new JPanel(); // Crea el panel para los botones numéricos
         panelNumeros.setLayout(new GridLayout(4, 3)); // Panel para los números
-        panelNumeros.setBackground(Color.LIGHT_GRAY); // color del panel
         panelNumeros.setBounds(10, 180, (d.width / 2) - 100, 350); // Ubica debajo de la pantalla y ajusta el ancho
         add(panelNumeros); // Añade el panel de los botones al JFrame
 
         // Panel para las operaciones
         JPanel panelOperaciones = new JPanel(); // Crea el panel para las operaciones
         panelOperaciones.setLayout(new GridLayout(5, 1)); // Panel para las operaciones
-        panelOperaciones.setBackground(Color.LIGHT_GRAY); // color del panel
         panelOperaciones.setBounds((d.width / 2) - 100, 180, 100, 350); // Ubica al lado derecho
         add(panelOperaciones); // Añade el panel de operaciones al JFrame
 
@@ -130,7 +128,9 @@ public class CalculadoraPantalla extends JFrame {
 
     public void manejarLaOperacion() {
         String texto = areaTexto.getText(); // Obtener el texto actual en el JTextArea
-    
+        if(texto.contains("Error")){
+            texto.replace("Error", "");
+        }
         if (texto.isEmpty()) { //Si no hay nada escrito
             return; // retorna
         }
@@ -145,7 +145,14 @@ public class CalculadoraPantalla extends JFrame {
         } catch (Exception e) {
             areaTexto.setText("Error"); // Si ocurre un error en el proceso
             areaAlmacenado.setText("Error en la operación"); // Muestra un mensaje de error en el dato almacenado
+            try {
+                Thread.sleep(1000); // pausa de 1 segndo
+                areaTexto.setText(""); // Si ocurre un error en el proceso
+             } catch (Exception ex) {
+                System.out.println(ex);
+             }
         }
+
     }
 
     private String calcularOperacion(String texto, String operadores) {
