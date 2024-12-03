@@ -25,6 +25,9 @@ public class CalculadoraPantalla extends JFrame {
     private JTextArea areaTexto;
     private JTextArea areaAlmacenado; // Sección para mostrar el dato almacenado
     private boolean tecladoOn = true;
+    private boolean buttonOn = true;
+    private int[] cont = {0,1,2};
+    private int modo = 0;
 
     public CalculadoraPantalla() {
         super("Calculadora de Víctor"); // nombre de la pestaña
@@ -44,14 +47,14 @@ public class CalculadoraPantalla extends JFrame {
         JScrollPane scrollTexto = new JScrollPane(areaTexto); // ayuda a corregir el cambio de lineas al escribir en la
 
         if(tecladoOn){ // Si el teclado está activado
-            activarTeclado();   // Permite la escritura de teclado
+            activarTeclado();
         }
 
         // Crear y configurar el área para mostrar el dato almacenado
-        areaAlmacenado = new JTextArea();
-        areaAlmacenado.setLineWrap(true);
-        areaAlmacenado.setWrapStyleWord(true);
-        areaAlmacenado.setFont(new Font("Arial", Font.PLAIN, 14));
+        areaAlmacenado = new JTextArea(); // crea un area de texto
+        areaAlmacenado.setLineWrap(true);   // hace el cambio de linea
+        areaAlmacenado.setWrapStyleWord(true);  // completa las palabras sin dejar a medias
+        areaAlmacenado.setFont(new Font("Arial", Font.PLAIN, 14)); // establebe fuente y su tamaño
         areaAlmacenado.setEditable(false);
         JScrollPane scrollAlmacenado = new JScrollPane(areaAlmacenado);
 
@@ -134,9 +137,25 @@ public class CalculadoraPantalla extends JFrame {
     private void manejarAccionBoton(String texto) {
         if (texto.equals("C")) { // Si se presiona el boton C
             areaTexto.setText(""); // Borra el contenido del JTextArea
-        } else if (texto.equals("=")) {
+        } else if (texto.equals("=") && buttonOn) {
             manejarLaOperacion(); // Llamada para manejar la operación
-        } else {
+        } else if(texto.equals("Change Mode")){
+            if(cont[modo] == 0){
+                buttonOn = true;
+                tecladoOn = true;
+            }else if(cont[modo] == 1){
+                buttonOn = true;
+                tecladoOn = false;
+            }else if(cont[modo] == 2){
+                buttonOn = false;
+                tecladoOn = true;
+            }
+            if(modo == 2){
+                modo = 0;
+            }else{
+                modo++;
+            }
+        }else if(buttonOn){
             areaTexto.append(texto); // Añade el texto del botón presionado
         }
     }
@@ -155,21 +174,27 @@ public class CalculadoraPantalla extends JFrame {
     
             texto = calcularOperacion(texto, "+-"); // Luego hace las sumas y restas y actualiza el valor de texto
     
-            areaTexto.setText(texto); // Escribe el texto en la pantalla
-            areaAlmacenado.setText(texto); // Muestra el dato almacenado
+            // Si el resultado es negativo, cambia el color del texto en el área de texto almacenado
+            if (Double.parseDouble(texto.replace(',', '.')) < 0) {
+                areaAlmacenado.setForeground(Color.RED); // Cambia el color a rojo
+            } else {
+                areaAlmacenado.setForeground(Color.BLACK); // Si no es negativo, lo pone negro
+            }
+    
+            areaAlmacenado.setText(texto); // Muestra el resultado en el área de texto almacenado
+    
         } catch (Exception e) {
-            areaTexto.setText("Error"); // Si ocurre un error en el proceso
-            areaAlmacenado.setText("Error en la operación"); // Muestra un mensaje de error en el dato almacenado
+            areaAlmacenado.setText("Error"); // Si ocurre un error en el proceso
+            areaAlmacenado.setForeground(Color.RED); // Cambia el color a rojo para el mensaje de error
             try {
-                Thread.sleep(1000); // pausa de 1 segndo
-                areaTexto.setText(""); // Si ocurre un error en el proceso
-             } catch (Exception ex) {
+                Thread.sleep(1000); // pausa de 1 segundo
+                areaAlmacenado.setText(""); // Si ocurre un error, limpia el texto
+            } catch (Exception ex) {
                 System.out.println(ex);
-             }
+            }
         }
-
     }
-
+    
     private String calcularOperacion(String texto, String operadores) {
         String regex = "(-?\\d+(?:[.,]\\d+)?)([" + operadores + "])(-?\\d+(?:[.,]\\d+)?)"; // busca el operador, detecta el numero de repeticiones
     
@@ -216,6 +241,9 @@ public class CalculadoraPantalla extends JFrame {
     }
 
     public void activarTeclado() {
+        if(!tecladoOn){
+            return;
+        }
         areaTexto.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
