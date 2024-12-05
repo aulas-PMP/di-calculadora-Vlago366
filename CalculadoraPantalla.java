@@ -24,114 +24,113 @@ public class CalculadoraPantalla extends JFrame {
     // Creamos una variable global para el JTextArea
     private JTextArea areaTexto;
     private JTextArea areaAlmacenado; // Sección para mostrar el dato almacenado
-    private boolean tecladoOn = true;
-    private boolean buttonOn = true;
-    private int[] cont = {0,1,2};
-    private int modo = 0;
+    private boolean tecladoOn = true; // activa el teclado
+    private boolean buttonOn = true; // activa el pulso de botones
+    private int[] cont = { 0, 1, 2 }; // Lista de posibles modos
+    private int modo = 0; // inicia en modo multi
+    private KeyAdapter tecladoListener; // Referencia al KeyListener
 
     public CalculadoraPantalla() {
-        super("Calculadora de Víctor"); // nombre de la pestaña
+        super("Calculadora de Víctor Modo Boton");
 
-        // Panel principal con diseño nulo para controlar manualmente el tamaño
-        JPanel pantallaSecundaria = new JPanel(); // crea la pantalla donde se escribe texto
-        pantallaSecundaria.setBackground(Color.LIGHT_GRAY); // color de pantalla
-        pantallaSecundaria.setLayout(new BorderLayout()); // El borde de layout
-        Dimension d = Toolkit.getDefaultToolkit().getScreenSize(); // Recoge las dimensiones de la pantalla
+        // Configuración del diseño principal
+        setLayout(new BorderLayout());
+        Dimension d = Toolkit.getDefaultToolkit().getScreenSize(); // Tamaño de pantalla
 
-        areaTexto = new JTextArea(); // permite ingresar texto
-        areaTexto.setLineWrap(true); // controla la longitud del texto cambiando a una segunda línea en caso de ser necesario
-        areaTexto.setWrapStyleWord(true); // controla que el texto no sea cortado a la mitad
-        areaTexto.setFont(new Font("Arial", Font.PLAIN, 14)); // La fuente en el area de texto
-        areaTexto.setEditable(false); // Evita que el usuario escriba directamente en el área de texto, sin esto acepta todo tipo de escritura
+        // Configuración del área de texto principal
+        areaTexto = new JTextArea();
+        areaTexto.setLineWrap(true);
+        areaTexto.setWrapStyleWord(true);
+        areaTexto.setFont(new Font("Arial", Font.PLAIN, 95));
+        areaTexto.setEditable(false);
 
-        JScrollPane scrollTexto = new JScrollPane(areaTexto); // ayuda a corregir el cambio de lineas al escribir en la
+        JScrollPane scrollTexto = new JScrollPane(areaTexto);
 
-        if(tecladoOn){ // Si el teclado está activado
-            activarTeclado();
-        }
-
-        // Crear y configurar el área para mostrar el dato almacenado
-        areaAlmacenado = new JTextArea(); // crea un area de texto
-        areaAlmacenado.setLineWrap(true);   // hace el cambio de linea
-        areaAlmacenado.setWrapStyleWord(true);  // completa las palabras sin dejar a medias
-        areaAlmacenado.setFont(new Font("Arial", Font.PLAIN, 14)); // establebe fuente y su tamaño
+        // Configuración del área para el dato almacenado
+        areaAlmacenado = new JTextArea();
+        areaAlmacenado.setLineWrap(true);
+        areaAlmacenado.setWrapStyleWord(true);
+        areaAlmacenado.setFont(new Font("Arial", Font.PLAIN, 50));
         areaAlmacenado.setEditable(false);
+
         JScrollPane scrollAlmacenado = new JScrollPane(areaAlmacenado);
 
-        // Panel para la entrada de datos (pantalla principal)
-        JPanel panelEntrada = new JPanel();
-        panelEntrada.setLayout(new BorderLayout());
-        panelEntrada.setBackground(Color.LIGHT_GRAY);
-        panelEntrada.setBounds(10, 10, d.width / 2, 100);
-        panelEntrada.add(scrollTexto, BorderLayout.CENTER);
-        
-        // Panel para mostrar el dato almacenado
-        JPanel panelAlmacenado = new JPanel();
-        panelAlmacenado.setLayout(new BorderLayout());
-        panelAlmacenado.setBackground(Color.LIGHT_GRAY);
-        panelAlmacenado.setBounds(10, 120, d.width / 2, 50); // Panel debajo del panel de entrada
-        panelAlmacenado.add(scrollAlmacenado, BorderLayout.CENTER);
-        
-        add(panelAlmacenado); // Añadir panel de dato almacenado al JFrame
-        add(panelEntrada); // Añadir panel de entrada al JFrame
+        // Crear un panel que contiene ambas áreas de texto
+        JPanel panelPantallas = new JPanel(new GridLayout(2, 1)); // Dos filas: una para cada área
+        panelPantallas.add(scrollTexto); // Área principal arriba
+        panelPantallas.add(scrollAlmacenado); // Área de almacenado abajo
 
-        setResizable(true); // permiso para ampliar la pantalla
-        setSize((d.width / 2), 600); // Indica el ancho y alto del recuadro
-        setLayout(null); // Layout nulo, para tener control manual de los tamaños
+        // Panel para los botones numéricos (4x3)
+        JPanel panelNumeros = new JPanel(new GridLayout(4, 3, 5, 5));
+        String[] botonesNumericos = {
+                "1", "2", "3",
+                "4", "5", "6",
+                "7", "8", "9",
+                "0", "C", "Change Mode"
+        };
 
-        // Panel para los botones numéricos
-        JPanel panelNumeros = new JPanel(); // Crea el panel para los botones numéricos
-        panelNumeros.setLayout(new GridLayout(4, 3)); // Panel para los números
-        panelNumeros.setBounds(10, 180, (d.width / 2) - 100, 350); // Ubica debajo de la pantalla y ajusta el ancho
-        add(panelNumeros); // Añade el panel de los botones al JFrame
+        for (String texto : botonesNumericos) {
+            Button button = new Button(texto);
+            button.setFont(new Font("Arial", Font.PLAIN, 20)); // cambia la fuente y el tamaño de letra
+            button.setBackground(!texto.equals("C") ? Color.WHITE : Color.GREEN); // cambios especificos para button C
+            button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    manejarAccionBoton(texto);
+                }
+            });
+            panelNumeros.add(button);
+        }
 
-        // Panel para las operaciones
-        JPanel panelOperaciones = new JPanel(); // Crea el panel para las operaciones
-        panelOperaciones.setLayout(new GridLayout(6, 1)); // Panel para las operaciones
-        panelOperaciones.setBounds((d.width / 2) - 100, 180, 100, 350); // Ubica al lado derecho
-        add(panelOperaciones); // Añade el panel de operaciones al JFrame
+        // Panel para las operaciones (6x1)
+        JPanel panelOperaciones = new JPanel(new GridLayout(6, 1, 5, 5));
+        String[] botonesOperaciones = { "/", "*", "-", "+", ",", "=" };
 
-        String[] botonesNumericos = { 
-                "1", "2", "3", 
-                "4", "5", "6", 
-                "7", "8", "9", 
-                "0","C", "Change Mode" 
-        }; // Son los nombres de los botones numéricos
+        for (String texto : botonesOperaciones) {
+            Button button = new Button(texto);
+            button.setFont(new Font("Arial", Font.PLAIN, 24));
+            button.setBackground(Color.WHITE);
+            button.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    manejarAccionBoton(texto);
+                }
+            });
+            panelOperaciones.add(button);
+        }
 
-        for (String texto : botonesNumericos) { // Para el array con los botones mientras haya
-            Button button = new Button(texto); // Se crea un boton con el contenido de dicha posición
-            button.setFont(new Font("Arial", Font.PLAIN, 20)); // Se describe la fuente y el tamaño
-            if(!texto.equals("C")){
-                button.setBackground(Color.WHITE); // El color del boton
-            }else{
-                button.setBackground(Color.GREEN); // El color del boton
+        // Panel inferior que combina botones numéricos y operaciones
+        JPanel panelBotones = new JPanel(new BorderLayout());
+        panelBotones.add(panelNumeros, BorderLayout.CENTER); // Botones numéricos en el centro
+        panelBotones.add(panelOperaciones, BorderLayout.EAST); // Operaciones a la derecha
+
+        // Agregar los paneles al JFrame
+        add(panelPantallas, BorderLayout.NORTH); // Panel con las áreas de texto en la parte superior
+        add(panelBotones, BorderLayout.CENTER); // Panel con los botones en la parte inferior
+
+        // Configuración de la ventana
+        setSize(d.width / 2, 600); // Tamaño inicial
+        setResizable(true); // Permite redimensionar
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Cerrar al salir
+
+        // Ajuste dinámico del tamaño
+        addComponentListener(new java.awt.event.ComponentAdapter() {
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                ajustarComponentes();
             }
-            button.addActionListener(new ActionListener() { // Al pulsar el boton
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    manejarAccionBoton(texto); // Llama al método que escribe el contenido del boton
-                }
-            });
-            panelNumeros.add(button); // Añade el boton al panel de números
-        }
+        });
+    }
 
-        String[] botonesOperaciones = {
-                "/", "*", "-",
-                "+", ",", "="
-        }; // Son los nombres de los botones de operaciones
+    // Ajuste dinámico de los componentes
+    private void ajustarComponentes() {
+        Dimension size = getSize();
+        int panelWidth = size.width;
+        int panelHeight = size.height / 2;
 
-        for (String texto : botonesOperaciones) { // Para el array con los botones de operaciones mientras haya
-            Button button = new Button(texto); // Se crea un boton con el contenido de dicha posición
-            button.setFont(new Font("Arial", Font.PLAIN, 20)); // Se describe la fuente y el tamaño
-            button.setBackground(Color.WHITE); // El color del boton
-            button.addActionListener(new ActionListener() { // Al pulsar el boton
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    manejarAccionBoton(texto); // Llama al método que escribe el contenido del boton
-                }
-            });
-            panelOperaciones.add(button); // Añade el boton al panel de operaciones
-        }
+        areaTexto.setPreferredSize(new Dimension(panelWidth, panelHeight / 4));
+        areaAlmacenado.setPreferredSize(new Dimension(panelWidth, panelHeight / 8));
+
+        repaint();
     }
 
     private void manejarAccionBoton(String texto) {
@@ -140,20 +139,31 @@ public class CalculadoraPantalla extends JFrame {
         } else if (texto.equals("=") && buttonOn) {
             manejarLaOperacion(); // Llamada para manejar la operación
         } else if(texto.equals("Change Mode")){
-            if(cont[modo] == 0){
-                buttonOn = true;
-                tecladoOn = true;
-            }else if(cont[modo] == 1){
-                buttonOn = true;
-                tecladoOn = false;
-            }else if(cont[modo] == 2){
-                buttonOn = false;
-                tecladoOn = true;
-            }
+
             if(modo == 2){
                 modo = 0;
             }else{
                 modo++;
+            }
+            if(cont[modo] == 0){
+                buttonOn = true;
+                tecladoOn = false;
+                setTitle("Calculadora Victor Modo Multi");
+            }else if(cont[modo] == 1){
+                buttonOn = false;
+                tecladoOn = false;
+                setTitle("Calculadora Victor Modo Botón");
+            }else if(cont[modo] == 2){
+                buttonOn = false;
+                tecladoOn = true;
+                setTitle("Calculadora Victor Modo Teclado");
+            }
+            if (tecladoOn) {
+                areaTexto.removeKeyListener(tecladoListener);
+                areaTexto.addKeyListener(tecladoListener);
+            } else {
+                areaTexto.removeKeyListener(tecladoListener); // Elimina correctamente el KeyListener
+                areaTexto.removeKeyListener(tecladoListener);
             }
         }else if(buttonOn){
             areaTexto.append(texto); // Añade el texto del botón presionado
@@ -241,51 +251,56 @@ public class CalculadoraPantalla extends JFrame {
     }
 
     public void activarTeclado() {
-        if(!tecladoOn){
-            return;
-        }
-        areaTexto.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                int keyCode = e.getKeyCode(); // obtiene el código de la tecla
+        if (tecladoListener == null) {
+            tecladoListener = new KeyAdapter() {
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    int keyCode = e.getKeyCode(); // Obtiene el código de la tecla
+                    if (isValidKey(keyCode)) {
+                        String keyText = "";
     
-                if (isValidKey(keyCode)) {
-                    String keyText = "";
+                        // Convertir las teclas numéricas y operadores a texto
+                        if (keyCode >= KeyEvent.VK_NUMPAD0 && keyCode <= KeyEvent.VK_NUMPAD9) {
+                            keyText = String.valueOf(keyCode - KeyEvent.VK_NUMPAD0);
+                        } else if (keyCode == KeyEvent.VK_ADD) {
+                            keyText = "+";
+                        } else if (keyCode == KeyEvent.VK_SUBTRACT) {
+                            keyText = "-";
+                        } else if (keyCode == KeyEvent.VK_MULTIPLY) {
+                            keyText = "*";
+                        } else if (keyCode == KeyEvent.VK_DIVIDE) {
+                            keyText = "/";
+                        } else if (keyCode == KeyEvent.VK_DECIMAL) {
+                            keyText = ",";
+                        } else if (keyCode == KeyEvent.VK_ENTER) {
+                            manejarLaOperacion(); // Si se presiona enter, realiza la operación
+                            return;
+                        }
     
-                    // Convertir las teclas numéricas y operadores a texto
-                    if (keyCode >= KeyEvent.VK_NUMPAD0 && keyCode <= KeyEvent.VK_NUMPAD9) {
-                        keyText = String.valueOf(keyCode - KeyEvent.VK_NUMPAD0);
-                    } else if (keyCode == KeyEvent.VK_ADD) {
-                        keyText = "+";
-                    } else if (keyCode == KeyEvent.VK_SUBTRACT) {
-                        keyText = "-";
-                    } else if (keyCode == KeyEvent.VK_MULTIPLY) {
-                        keyText = "*";
-                    } else if (keyCode == KeyEvent.VK_DIVIDE) {
-                        keyText = "/";
-                    } else if (keyCode == KeyEvent.VK_DECIMAL) {
-                        keyText = ",";
-                    } else if (keyCode == KeyEvent.VK_ENTER) {
-                        manejarLaOperacion(); // Si se presiona enter, se realiza la operación
-                        return;
+                        areaTexto.append(keyText); // Añade el texto del botón presionado al área de texto
                     }
-    
-                    areaTexto.append(keyText); // Añade el texto del botón presionado al área de texto
+                    e.consume(); // Evita que el teclado realice la acción predeterminada
                 }
-                e.consume(); // Evita que el teclado realice la acción predeterminada
-            }
     
-            private boolean isValidKey(int keyCode) {
-                return (keyCode >= KeyEvent.VK_NUMPAD0 && keyCode <= KeyEvent.VK_NUMPAD9)
-                        || keyCode == KeyEvent.VK_ADD
-                        || keyCode == KeyEvent.VK_SUBTRACT
-                        || keyCode == KeyEvent.VK_MULTIPLY
-                        || keyCode == KeyEvent.VK_DIVIDE
-                        || keyCode == KeyEvent.VK_ENTER
-                        || keyCode == KeyEvent.VK_DECIMAL;
-            }
-        });
+                private boolean isValidKey(int keyCode) {
+                    return (keyCode >= KeyEvent.VK_NUMPAD0 && keyCode <= KeyEvent.VK_NUMPAD9)
+                            || keyCode == KeyEvent.VK_ADD
+                            || keyCode == KeyEvent.VK_SUBTRACT
+                            || keyCode == KeyEvent.VK_MULTIPLY
+                            || keyCode == KeyEvent.VK_DIVIDE
+                            || keyCode == KeyEvent.VK_ENTER
+                            || keyCode == KeyEvent.VK_DECIMAL;
+                }
+            };
+        }
+    
+        if (tecladoOn) {
+            areaTexto.addKeyListener(tecladoListener);
+        } else {
+            areaTexto.removeKeyListener(tecladoListener);
+        }
     }
+    
 
     public static void main(String[] args) {
         CalculadoraPantalla ventana = new CalculadoraPantalla();
