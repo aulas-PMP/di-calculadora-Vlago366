@@ -110,6 +110,7 @@ public class CalculadoraPantalla extends JFrame {
 
         // Configuración de la ventana
         setSize(d.width / 2, 600); // Tamaño inicial
+        setLocationRelativeTo(null); // Centra la ventana
         setResizable(true); // Permite redimensionar
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Cerrar al salir
 
@@ -145,26 +146,22 @@ public class CalculadoraPantalla extends JFrame {
             }else{
                 modo++;
             }
-            if(cont[modo] == 0){
+            if (cont[modo] == 0) {
                 buttonOn = true;
                 tecladoOn = false;
+                setTitle("Calculadora Victor Modo Boton");
+                areaTexto.removeKeyListener(tecladoListener); // Asegúrate de remover el listener
+            } else if (cont[modo] == 1) {
+                buttonOn = true;
+                tecladoOn = true;
                 setTitle("Calculadora Victor Modo Multi");
-            }else if(cont[modo] == 1){
-                buttonOn = false;
-                tecladoOn = false;
-                setTitle("Calculadora Victor Modo Botón");
-            }else if(cont[modo] == 2){
+                activarTeclado();
+            } else if (cont[modo] == 2) {
                 buttonOn = false;
                 tecladoOn = true;
                 setTitle("Calculadora Victor Modo Teclado");
             }
-            if (tecladoOn) {
-                areaTexto.removeKeyListener(tecladoListener);
-                areaTexto.addKeyListener(tecladoListener);
-            } else {
-                areaTexto.removeKeyListener(tecladoListener); // Elimina correctamente el KeyListener
-                areaTexto.removeKeyListener(tecladoListener);
-            }
+            
         }else if(buttonOn){
             areaTexto.append(texto); // Añade el texto del botón presionado
         }
@@ -300,7 +297,6 @@ public class CalculadoraPantalla extends JFrame {
             areaTexto.removeKeyListener(tecladoListener);
         }
     }
-    
 
     public static void main(String[] args) {
         CalculadoraPantalla ventana = new CalculadoraPantalla();
